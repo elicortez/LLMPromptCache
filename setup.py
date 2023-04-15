@@ -5,8 +5,7 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
-        'psutil',
-        're'
+        'psutil'
     ],
     author="Your Name",
     author_email="your.email@example.com",
