@@ -2,6 +2,8 @@ import pickle
 import os
 import psutil
 import time
+import re
+import string
 
 class LLMPromptCache:
     def __init__(self, similarity_threshold=0.5, max_size=None, max_elements=None, max_memory=None):
@@ -19,10 +21,17 @@ class LLMPromptCache:
         union = set1.union(set2)
         return len(intersection) / len(union)
 
+    def preprocess_input(self, text):
+        # Convert text to lowercase and remove punctuation
+        text = text.lower()
+        text = re.sub(f"[{re.escape(string.punctuation)}]", "", text)
+        return text
+
     def add_to_cache(self, prompt, response, model_name):
+        preprocessed_prompt = self.preprocess_input(prompt)
         for key in self.cache:
             cached_prompt = self.cache[key]['input']
-            similarity = self.jaccard_similarity(prompt, cached_prompt)
+            similarity = self.jaccard_similarity(preprocessed_prompt , cached_prompt)
             if similarity >= self.similarity_threshold:
                 # Store the new prompt under the same key if it's similar enough
                 self.cache[key]['similar_prompts'].append({'input': prompt, 'output': response})
@@ -40,9 +49,11 @@ class LLMPromptCache:
         }
 
     def get_response(self, prompt):
+        preprocessed_prompt = self.preprocess_input(prompt)
+
         for key in self.cache:
             cached_prompt = self.cache[key]['input']
-            similarity = self.jaccard_similarity(prompt, cached_prompt)
+            similarity = self.jaccard_similarity(preprocessed_prompt, cached_prompt)
             if similarity >= self.similarity_threshold:
                 return self.cache[key]['output']
         return None
