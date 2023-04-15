@@ -1,7 +1,7 @@
 # LLM Prompt Cache
 
 A caching library for language model prompts and responses.
-Initial version uses Jaccard similarity.
+Initial version uses [Jaccard similarity](https://en.wikipedia.org/wiki/Jaccard_index).
 
 ## Installation
 
